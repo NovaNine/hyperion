@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Hyperion Plugin",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "msbuild hyperion.csproj /p:Configuration=Release"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$msCompile"],
+      "presentation": {
+        "reveal": "always"
+      }
+    },
+    {
+      "label": "Deploy Hyperion Plugin",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-Command",
+        "& { $TIPath = ''F:\\SteamLibrary\\steamapps\\common\\Terra Invicta\\''; Copy-Item -Path ''bin\\Release\\net472\\Hyperion.dll'' -Destination \"$TIPath\\\\BepInEx\\\\plugins\\\\Hyperion.dll\" -Force }"
+      ],
+      "group": "none",
+      "presentation": {
+        "reveal": "always"
+      }
+    }    
+  ]
+}
