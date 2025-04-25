@@ -1,4 +1,9 @@
 {
+  "hyperion.tiPath": "F:\\SteamLibrary\\steamapps\\common\\Terra Invicta",
   "editor.tabSize": 2,
-  "editor.indentSize": "tabSize"
+  "editor.insertSpaces": true,
+  "editor.formatOnSave": true,
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"  
+  }
 }

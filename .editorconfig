@@ -1,0 +1,13 @@
+# .editorconfig - Code style settings
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+
+# Optional: force consistent naming and formatting (used by dotnet-format)
+csharp_new_line_before_open_brace = all
+csharp_indent_multiline_expression = true

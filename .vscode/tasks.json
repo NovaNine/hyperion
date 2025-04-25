@@ -26,7 +26,7 @@
       "args": [
         "-NoProfile",
         "-Command",
-        "& { $TIPath = ''F:\\SteamLibrary\\steamapps\\common\\Terra Invicta\\''; Copy-Item -Path ''bin\\Release\\net472\\Hyperion.dll'' -Destination \"$TIPath\\\\BepInEx\\\\plugins\\\\Hyperion.dll\" -Force }"
+        "& { $TIPath = ''${config:hyperion.tiPath}''; Copy-Item -Path ''bin\\Release\\net472\\Hyperion.dll'' -Destination \"$TIPath\\\\BepInEx\\\\plugins\\\\Hyperion.dll\" -Force }"
       ],
       "group": "none",
       "presentation": {

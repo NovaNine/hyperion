@@ -1,10 +1,15 @@
+// This project is licensed under CC BY-NC 4.0
+// You may not use this work for commercial purposes.
+// Attribution: © 2025 Nova9
+
 using System;
 using System.IO;
 using UnityEngine;
 
-namespace Hyperion {
-  public static class Output {
-
+namespace Hyperion
+{
+  public static class Output
+  {
     /// <summary>
     /// The full path where Hyperion outputs its main log
     /// </summary>
@@ -17,18 +22,21 @@ namespace Hyperion {
     /// File lock for the log file
     /// </summary>
     private static readonly object LogFileLock = new object();
-    
-    public static void Info(string msg) {
+
+    public static void Info(string msg)
+    {
       UnityEngine.Debug.Log($"[Hyperion] [INFO] {msg}");
       WriteToFile($"[INFO] {GetTimestamp()} {msg}");
     }
 
-    public static void Debug(string msg) {
+    public static void Debug(string msg)
+    {
       UnityEngine.Debug.Log($"[Hyperion] [DBUG] {msg}");
       WriteToFile($"[DBUG] {GetTimestamp()} {msg}");
     }
 
-    public static string GetTimestamp() {
+    public static string GetTimestamp()
+    {
       return $"{DateTime.Now:u}";
     }
 
