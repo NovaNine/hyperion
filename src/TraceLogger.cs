@@ -31,11 +31,17 @@ namespace Hyperion
       new Regex("^.*\\.Log$"),
       new Regex("^.*\\.UI\\..*$"),
       new Regex("^.*\\+<>c.*$"),
+      new Regex("^.*\\+<[^>]*>d__.*$"),
+      new Regex("^.*\\+<[^>]*>o__.*$"),
       new Regex("^.*\\.Audio\\..*$"),
       new Regex("^.*\\.Mood$"),
       new Regex("^.*\\.Loc$"),    // Crash?
       new Regex("^.*\\.TIUtilities$"),  // Crash?
       new Regex("^.*\\.TI[^.]Template$"), // Crash?
+
+      new Regex("^.*\\.IName.*$"),
+      new Regex("^.*\\.IEvent.*$"),
+      new Regex("^.*\\..*Parser$"),
 
       new Regex("^.*\\.OptionsScreenController.*$"),
       new Regex("^.*\\.SavingFailedDialog.*$"),
@@ -51,6 +57,21 @@ namespace Hyperion
       new Regex("^.*\\.[^.]*MenuController$"),
       new Regex("^.*\\.RightClickHandler$"),
       new Regex("^.*\\.TabbedPaneController$"),
+      new Regex("^.*\\.TabbedPaneManager$"),
+      new Regex("^.*\\..*GridItem$"),
+      new Regex("^.*\\..*PanelOpened$"),
+      new Regex("^.*\\..*PanelClosed$"),
+      new Regex("^.*\\..*ScreenOpened$"),
+      new Regex("^.*\\..*ScreenClosed$"),
+      new Regex("^.*\\..*UIRequested$"),
+      new Regex("^.*\\.TargetSelectionTool$"),
+      new Regex("^.*\\.LocalizationManager$"),
+      new Regex("^.*\\.AssetCacheManager$"),
+      new Regex("^.*\\..*CanvasController.*$"),
+      new Regex("^.*\\..*IconController.*$"),
+      new Regex("^.*\\.GeneralControlsController$"),
+
+      new Regex("^.*\\.FloatExtensions$"),
 
       new Regex("^.*\\.SpaceCombat\\..*$"),
 
@@ -68,8 +89,13 @@ namespace Hyperion
       new Regex("^.*\\..*ItemViewsHolder$"),
 
       new Regex("^.*\\.StrategyShipContoller$"),
+      new Regex("^.*\\.Ship.ComponentMap$"),
+      new Regex("^.*\\.Ship.I(Armor|Weapon|Component|BaseComponent|Hull|FireMode|HullSection)$"),
 
       new Regex("^.*\\..*Vector3.*$"),
+
+      new Regex("^.*\\.HabGridCell$"),
+      new Regex("^.*\\.CouncilorAppearanceGridItem$"),
 
       new Regex("^.*\\.Alien.*Controller$"),
 
@@ -77,20 +103,115 @@ namespace Hyperion
       new Regex("^.*\\.TINotificationQueueState\\..*$"),
       new Regex("^.*\\.TIRegionUFO.*$"),
       new Regex("^.*\\.TIRegionXenoforming.*$"),
+
+      new Regex("^.*\\.Tasks\\.AI.*$"),
+
+      // May be worth revisiting
+      new Regex("^.*\\.TIHabSiteState$"),
     };
 
     private static readonly (Regex ClassPattern, Regex MethodPattern)[] ExcludePatterns = new (Regex, Regex)[] {
 
       (new Regex("^.*$"), new Regex("^<[A-Za-z0-9_]*>b__.*$")),
+      (new Regex("^.*$"), new Regex("^<[A-Za-z0-9_]*>g__.*$")),
       (new Regex("^.*$"), new Regex("^.*Mesh.*$")),
+      (new Regex("^.*$"), new Regex("^Equals$")),
+      (new Regex("^.*$"), new Regex("^Compare$")),
+      (new Regex("^.*$"), new Regex("^Add(Sorted|Event|Listener(s)?|Cost)$")),
+      (new Regex("^.*$"), new Regex("^GetHashCode$")),
+      (new Regex("^.*$"), new Regex("^Tick$")),
+      (new Regex("^.*$"), new Regex("^Update$")),
+      (new Regex("^.*$"), new Regex("^Nothing$")),
+      (new Regex("^.*$"), new Regex("^GetString$")),
+      (new Regex("^.*$"), new Regex("^To(String|Percent|Global)$")),
+      (new Regex("^.*$"), new Regex("^ToResource(s)?Cost$")),
+      (new Regex("^.*$"), new Regex("^.*ToolTip.*$")),
+      (new Regex("^.*$"), new Regex("^SetColor.*$")),
+      (new Regex("^.*$"), new Regex("^Cache.*$")),
+      (new Regex("^.*$"), new Regex("^SetPreviewer$")),
+      (new Regex("^.*$"), new Regex("^.*GlobalCartesian.*$")),
+      (new Regex("^.*$"), new Regex("^.*PositionAtTime.*$")),
+      (new Regex("^.*$"), new Regex("^.*ToCartesian.*$")),
       (new Regex("^.*\\.TemplateManager$"), new Regex("^Add$")),
       (new Regex("^.*\\.TemplateManager$"), new Regex("^ClearSkirmishModeTemplates$")),
       (new Regex("^.*\\.TemplateManager$"), new Regex("^RegisterFileBasedTemplate$")),
       (new Regex("^.*\\.TemplateManager$"), new Regex("^RegisterFileBasedTemplates$")),
       (new Regex("^.*\\.TemplateManager$"), new Regex("^RegisterClassBasedTemplates$")),
-      (new Regex("^.*\\.TemplateManager$"), new Regex("^FindDataTemplateType$")),
+      (new Regex("^.*\\.TemplateManager$"), new Regex("^Find.*$")),
       (new Regex("^.*\\.GlobalInstaller$"), new Regex("^HandleException$")),
       (new Regex("^.*\\.UnityConsoleAppender$"), new Regex("^Append$")),
+
+      (new Regex("^.*\\.TICouncilorState$"), new Regex("^GetMonthlyIncomeFrom.*$")),
+      (new Regex("^.*\\.TICouncilorState$"), new Regex("^GetAttribute$")),
+
+      (new Regex("^.*\\.TIHabSiteState$"), new Regex("^Modify.*$")),
+      (new Regex("^.*\\.TIHabModuleState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TIHabModuleState$"), new Regex("^SetSolarPowerOutput$")),
+
+      (new Regex("^.*\\.TIGlobalValuesState$"), new Regex("^GetGlobalMineProductivityModifier.*$")),
+      (new Regex("^.*\\.TIGlobalValuesState$"), new Regex("^TryDeserialize$")),
+      (new Regex("^.*\\.TIGlobalValuesState$"), new Regex("^CreateInstance$")),
+      (new Regex("^.*\\.TIGlobalValuesState$"), new Regex("^DeserializeGameStateFromID$")),
+
+      (new Regex("^.*\\.TIGameState$"), new Regex("^Valid$")),
+      (new Regex("^.*\\.TIGameState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TIGameStateConverter$"), new Regex("^TryDeserialize$")),
+      (new Regex("^.*\\.TIGameStateConverter$"), new Regex("^CreateInstance$")),
+      (new Regex("^.*\\.TIGameStateConverter$"), new Regex("^DeserializeGameStateFromID$")),
+
+      (new Regex("^.*\\.TIGlobalValuesState$"), new Regex("^NarrativeEventTemplate$")),
+
+      (new Regex("^.*\\.TIRegionState$"), new Regex("^AddClaim$")),
+      (new Regex("^.*\\.TIControlPoint$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TIOrgState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TIOrgState$"), new Regex("^InitRunTimeValues$")),
+      (new Regex("^.*\\.TIOrgState$"), new Regex("^GetStatBonus$")),
+      (new Regex("^.*\\.TIRegionState$"), new Regex("^IsFullyOccupied$")),
+      (new Regex("^.*\\.TINationState$"), new Regex("^GetFactionMissionControlFromNation$")),
+      (new Regex("^.*\\.TINationState$"), new Regex("^GetMonthlyCouncilResourceShare$")),
+      (new Regex("^.*\\.TINationState$"), new Regex("^GetPublicOpinionOfFaction$")),
+      (new Regex("^.*\\.TINationState$"), new Regex("^AddToMaxMilitaryTechLevel$")),
+      (new Regex("^.*\\.TINationState$"), new Regex("^GetIdeologicalDistance$")),
+      (new Regex("^.*\\.TINationState$"), new Regex("^GetInlinePriorityIcon$")),
+      (new Regex("^.*\\.TI(Region|Nation)State$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TI(Region|Nation)State$"), new Regex("^InitializeAllTrackers$")),
+      (new Regex("^.*\\.TI(Region|Nation)State$"), new Regex("^SetDisplayNameAndFlag$")),
+
+      (new Regex("^.*\\.TIFactionState$"), new Regex("^UnlockedShipPart$")),
+      (new Regex("^.*\\.TIFactionState$"), new Regex("^LogAI$")),
+      (new Regex("^.*\\.TIFactionState$"), new Regex("^IsASpaceResource$")),
+      (new Regex("^.*\\.TIFactionState$"), new Regex("^Get.*IncomeFrom.*$")),
+      (new Regex("^.*\\.TIFactionState$"), new Regex("^.*Intel.*$")),
+      (new Regex("^.*\\.GameStateManager$"), new Regex("^AllFactions$")),
+      (new Regex("^.*\\.TICouncilorState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TICouncilorState$"), new Regex("^Get.*Income$")),
+      (new Regex("^.*\\.TICouncilorState$"), new Regex("^GetResource.*$")),
+      (new Regex("^.*\\.TICouncilorState$"), new Regex("^Set(LearnedMissions|Traits)$")),
+
+      (new Regex("^.*\\.TIOrbitState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TISpaceBodyState$"), new Regex("^(innerSystemAsteroid|innerMainBeltAsteroid|midMainBeltAsteroid|outerMainBeltAsteroid|centaur|kuiperBeltObject)$")),
+      (new Regex("^.*\\.TISpaceBodyState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+      (new Regex("^.*\\.TISpaceBodyState$"), new Regex("^GetRotationPeriod_Hours$")),
+      (new Regex("^.*\\.TISpaceBodyState$"), new Regex("^GetPolarRadius_m$")),
+      (new Regex("^.*\\.TISpaceBodyState$"), new Regex("^GetMeanRadius_km$")),
+      (new Regex("^.*\\.GameStateManager$"), new Regex("^(Sol|InnerSystemAsteroids|Mars|InnerAsteroidBelt|MidAsteroidBelt|OuterAsteroidBelt|Jupiter|Neptune|Centaurs|KuiperBeltObjects)$")),
+      (new Regex("^.*\\.TISpaceObjectState$"), new Regex("^To(Local|Global).*AtTime$")),
+      (new Regex("^.*\\.TISpaceObjectState$"), new Regex("^ExactDistance.*$")),
+      (new Regex("^.*\\.TISpaceObjectState$"), new Regex("^GetSunOrbitingRelatedObject_static$")),
+      (new Regex("^.*\\.TISpaceObjectState$"), new Regex("^OrbitalPeriod$")),
+      (new Regex("^.*\\.TISpaceObjectState$"), new Regex("^ToCartesian.*$")),
+      (new Regex("^.*\\.TISpaceObjectState$"), new Regex("^ExactDistance.*$")),
+      (new Regex("^.*\\.TINaturalSpaceObjectState$"), new Regex("^SetHillRadius_m.*$")),
+      (new Regex("^.*\\.OrbitalElementsState$"), new Regex("^Get.*Anomaly$")),
+      (new Regex("^.*\\.TILagrangePointState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+
+      (new Regex("^.*\\.TIResourcesCost$"), new Regex("^SumCosts_NoDuration$")),
+
+      (new Regex("^.*\\.TITimeState$"), new Regex("^Now$")),
+
+      (new Regex("^.*\\.TIArmyState$"), new Regex("^PostGlobalGameStateCreateInit_2$")),
+
+      (new Regex("^.*\\.GameStateManager$"), new Regex("^GlobalValues$")),
     };
 
     private static int _lineCounter = 0;

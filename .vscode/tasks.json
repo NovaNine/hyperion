@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build Hyperion Plugin",
+      "label": "Build Plugin",
       "type": "shell",
       "command": "powershell",
       "args": [
@@ -20,7 +20,8 @@
       }
     },
     {
-      "label": "Deploy Hyperion Plugin",
+      "label": "Deploy Plugin",
+      "dependsOn": ["Build Plugin"],
       "type": "shell",
       "command": "powershell",
       "args": [
@@ -32,6 +33,6 @@
       "presentation": {
         "reveal": "always"
       }
-    }    
+    }
   ]
 }

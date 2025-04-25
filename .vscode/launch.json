@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Terra Invicta",
+      "type": "coreclr", // or "coreclr" if you were running a .NET app directly
+      "request": "launch",
+      "program": "${config:hyperion.tiPath}\\TerraInvicta.exe",
+      "cwd": "${config:hyperion.tiPath}",
+      "preLaunchTask": "Deploy Plugin",
+      "stopAtEntry": false
+    }
+  ]
+}
