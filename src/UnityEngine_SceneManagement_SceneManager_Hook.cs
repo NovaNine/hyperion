@@ -1,3 +1,7 @@
+// This project is licensed under CC BY-NC 4.0
+// You may not use this work for commercial purposes.
+// © 2025 Nova9
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -19,11 +23,11 @@ namespace Hyperion
     private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
       var sceneName = scene.name ?? "<NULL Scene>";
-      Output.Info($"[Hyperion] Scene loaded: {sceneName}");
+      Output.Debug($"Scene loaded: {sceneName}");
 
       if (scene != null) {
         foreach (var root in scene.GetRootGameObjects())
-          Output.Info($"  Root object: {root.name}");
+          Output.Debug($"   * Root object: {root.name}");
 
         // If we're entering the in-game scene, add further hooks to detect load finishing
         if (scene.name == "SolarSystemScene")
@@ -36,35 +40,7 @@ namespace Hyperion
     private static void OnSceneUnloaded(Scene scene)
     {
       var sceneName = scene.name ?? "<NULL Scene>";
-      Output.Info($"[Hyperion] Scene unloaded: {sceneName}");
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(SceneManager.LoadSceneAsync), new[] { typeof(string), typeof(LoadSceneMode) })]
-    public static void LoadSceneAsync_Prefix(string sceneName, LoadSceneMode mode)
-    {
-      Output.Debug($"[Harmony] Loading scene asynchronously: {sceneName} with mode: {mode}");
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(SceneManager.LoadScene), new[] { typeof(string), typeof(LoadSceneMode) })]
-    public static void LoadScene_Prefix(string sceneName, LoadSceneMode mode)
-    {
-      Output.Debug($"[Harmony] Loading scene: {sceneName} with mode: {mode}");
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(SceneManager.UnloadSceneAsync), new[] { typeof(string) })]
-    public static void UnloadSceneAsync_Prefix(string sceneName)
-    {
-      Output.Debug($"[Harmony] Unloading scene: {sceneName}");
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(nameof(SceneManager.SetActiveScene))]
-    public static void SetActiveScene_Prefix(Scene scene)
-    {
-      Output.Debug($"[Harmony] Setting active scene: {scene.name}");
+      Output.Debug($"Scene unloaded: {sceneName}");
     }
   }
 }
