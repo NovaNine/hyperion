@@ -9,33 +9,66 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class LiteDbWriter
+namespace Hyperion.Writer
 {
-  private LiteDatabase db;
-
-  public LiteDbWriter(string filePath)
+  /// <summary>
+  /// LiteDbWriter implements IDataWriter to write data to a LiteDB database.
+  /// </summary>
+  public class LiteDbWriter
   {
-    db = new LiteDatabase(filePath);
-  }
+    /// <summary>
+    /// The LiteDB database instance.
+    /// </summary>
+    private LiteDatabase db;
 
-  public void Insert<T>(T record)
-  {
-    this.Insert("history", record);
-  }
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="filePath"></param>
+    public LiteDbWriter(string filePath)
+    {
+      db = new LiteDatabase(filePath);
+    }
 
-  public void Insert<T>(string collectionName, T record)
-  {
-    var collection = db.GetCollection<T>(collectionName);
-    collection.Insert(record);
-  }
+    /// <summary>
+    /// Inserts a record into the "history" collection in the db.
+    /// If the collection does not exist, it will be created.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="record"></param>
+    public void Insert<T>(T record)
+    {
+      this.Insert("history", record);
+    }
 
-  public void Flush()
-  {
-    db.Checkpoint();
-  }
+    /// <summary>
+    /// Inserts a record into the specified collection in the db.
+    /// If the collection does not exist, it will be created.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="collectionName"></param>
+    /// <param name="record"></param>
+    public void Insert<T>(string collectionName, T record)
+    {
+      var collection = db.GetCollection<T>(collectionName);
+      collection.Insert(record);
+    }
 
-  public void Dispose()
-  {
-    db?.Dispose();
+    /// <summary>
+    /// Flushes the database to ensure all changes are written to disk.
+    /// </summary>
+    public void Flush()
+    {
+      db.Checkpoint();
+    }
+
+    /// <summary>
+    /// Disposes of the LiteDB database instance.
+    /// </summary>
+    public void Dispose()
+    {
+      Flush();
+      db?.Dispose();
+    }
   }
 }

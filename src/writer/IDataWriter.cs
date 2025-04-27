@@ -3,12 +3,18 @@
 // © 2025 Nova9
 using System;
 
-public interface IDataWriter : IDisposable
+namespace Hyperion.Writer
 {
   /// <summary>
-  /// Implementations must provide a constructor: (string path)
+  /// Interface for data writers.
   /// </summary>
-  void Insert<T>(string path, T record);
-  void Set<T>(string path, T record);
-  void Flush();
+  /// <remarks>
+  /// Implementations must provide a constructor that accepts a string path.
+  /// </remarks>
+  public interface IDataWriter : IDisposable
+  {
+    void Insert<T>(string path, T record);
+    void Set<T>(string path, T record);
+    void Flush();
+  }
 }

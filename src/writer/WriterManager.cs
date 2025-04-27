@@ -9,9 +9,20 @@ using UnityEngine;
 
 namespace Hyperion.Writer
 {
+  /// <summary>
+  /// WriterManager is responsible for managing multiple data writers and sending the data to all writers.
+  /// </summary>
   public class WriterManager
   {
+    /// <summary>
+    /// List of data writers to be used.
+    /// </summary>
     private List<IDataWriter> writers = new List<IDataWriter>();
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="fileName"></param>
     public WriterManager(string fileName)
     {
       var _filePath = Path.Combine(
@@ -25,6 +36,12 @@ namespace Hyperion.Writer
       writers.Add(new JSONWriter(_filePath + ".json"));
     }
 
+    /// <summary>
+    /// Inserts a record into all writers.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="category"></param>
+    /// <param name="record"></param>
     public void Insert<T>(string category, T record)
     {
       foreach (var writer in writers)
@@ -33,6 +50,12 @@ namespace Hyperion.Writer
       }
     }
 
+    /// <summary>
+    /// Sets a record at path in all writers.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="path"></param>
+    /// <param name="record"></param>
     public void Set<T>(string path, T record)
     {
       foreach (var writer in writers)
@@ -41,6 +64,9 @@ namespace Hyperion.Writer
       }
     }
 
+    /// <summary>
+    /// Flushes all writers to ensure all data is written to disk.
+    /// </summary>
     public void Flush()
     {
       foreach (var writer in writers)
@@ -49,6 +75,9 @@ namespace Hyperion.Writer
       }
     }
 
+    /// <summary>
+    /// Disposes of all writers to release resources.
+    /// </summary>
     public void Dispose()
     {
       foreach (var writer in writers)

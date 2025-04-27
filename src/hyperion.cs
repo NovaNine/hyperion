@@ -29,6 +29,7 @@ namespace Hyperion
       harmony.PatchAll(typeof(UnityEngine_SceneManagement_SceneManager_Hook));
       //harmony.PatchAll(typeof(StartMenuController_Hook));
       harmony.PatchAll(typeof(TIGlobalResearchStateHooks));
+      harmony.PatchAll(typeof(TIFactionStateHooks));
     }
   }
 }

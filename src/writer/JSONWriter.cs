@@ -11,12 +11,30 @@ using UnityEngine.Profiling;
 
 namespace Hyperion.Writer
 {
+  /// <summary>
+  /// JSONWriter implements the IDataWriter interface for writing data to a JSON file.
+  /// </summary>
   public class JSONWriter : IDataWriter
   {
+    /// <summary>
+    /// The file path where the JSON data will be saved.
+    /// </summary>
     private readonly string _filePath;
+
+    /// <summary>
+    /// The root JSON object that will be written to the file.
+    /// </summary>
     private JObject _rootObject;
+
+    /// <summary>
+    /// Flag indicating whether the JSON data has been modified since the last save.
+    /// </summary>
     private bool _dirty;
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="filePath"></param>
     public JSONWriter(string filePath)
     {
       _filePath = filePath;
@@ -24,6 +42,12 @@ namespace Hyperion.Writer
       _dirty = false;
     }
 
+    /// <summary>
+    /// Inserts a record into a JSON data array at the specified path.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="path"></param>
+    /// <param name="record"></param>
     public void Insert<T>(string path, T record)
     {
       if (record == null || string.IsNullOrWhiteSpace(path))
@@ -43,11 +67,23 @@ namespace Hyperion.Writer
       Output.Trace($"JSON Insert at {path}: {record}");
     }
 
+    /// <summary>
+    /// Inserts a record into the "history" array in the JSON data.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="record"></param>
     public void Insert<T>(T record)
     {
       this.Insert("history", record);
     }
 
+    /// <summary>
+    /// Sets a value at the specified path in the JSON data.
+    /// If the path does not exist, it will be created.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="path"></param>
+    /// <param name="value"></param>
     public void Set<T>(string path, T value)
     {
       if (string.IsNullOrWhiteSpace(path))
@@ -70,17 +106,37 @@ namespace Hyperion.Writer
       Output.Trace($"JSON Set: {path} = {value}");
     }
 
+    /// <summary>
+    /// Splits a path string into an array of segments.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     private string[] SplitPath(string path)
     {
       return path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
     }
 
+    /// <summary>
+    /// Ensures that a path exists in the JSON data.
+    /// If the path does not exist, it will be created.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="path"></param>
+    /// <returns></returns>
     private T EnsurePathExists<T>(string path) where T : JToken, new()
     {
       var segments = SplitPath(path);
       return EnsurePathExists<T>(segments);
     }
 
+    /// <summary>
+    /// Ensures that a path exists in the JSON data.
+    /// If the path does not exist, it will be created.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="segments"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     private T EnsurePathExists<T>(string[] segments) where T : JToken, new()
     {
       JToken current = _rootObject;
@@ -126,7 +182,9 @@ namespace Hyperion.Writer
       return (T)current;
     }
 
-
+    /// <summary>
+    /// Flushes the JSON data to the file.
+    /// </summary>
     public void Flush()
     {
       if (!_dirty)
@@ -145,6 +203,9 @@ namespace Hyperion.Writer
       }
     }
 
+    /// <summary>
+    /// Disposes of the JSONWriter, flushing any unsaved data to the file.
+    /// </summary>
     public void Dispose()
     {
       Flush();
