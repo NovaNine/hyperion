@@ -8,6 +8,7 @@ public interface IDataWriter : IDisposable
   /// <summary>
   /// Implementations must provide a constructor: (string path)
   /// </summary>
-  void Insert<T>(T record);
+  void Insert<T>(string path, T record);
+  void Set<T>(string path, T record);
   void Flush();
 }

@@ -1,6 +1,7 @@
 using BepInEx;
 using HarmonyLib;
 using PavonisInteractive.TerraInvicta;
+using PavonisInteractive.TerraInvicta.Systems;
 using System;
 using System.Linq;
 
@@ -37,6 +38,10 @@ namespace Hyperion {
 
       Output.Info(techProgress.techTemplate?.displayName);
       Output.Info($"Research completed by [{tifactionState.displayName}, {tifactionState.displayNameCapitalized}]");
+      foreach (var rec in __instance.GetTechProgress(slot).factionContributions)
+      {
+        Output.Info($"   * {rec.Key.displayName} contributed {rec.Value}");
+      }
     }
 
     /* [HarmonyPostfix]

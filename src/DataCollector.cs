@@ -52,6 +52,10 @@ namespace Hyperion
       Output.Info($"It is {gameDate:ToString(\"yyyy-MM-dd HH:mm\")} in the game.");
 
       writerManager = new WriterManager($"{playerFaction}-{playerIdeology}");
+      writerManager.Set("meta.playerFaction", playerFaction);
+      writerManager.Set("meta.playerIdeology", playerIdeology);
+      writerManager.Set("meta.initialGameDate", gameDate.ToString("yyyy-MM-dd HH:mm"));
+      writerManager.Flush();
     }
 
     public void Dispose()

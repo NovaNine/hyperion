@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class LiteDbWriter : IDataWriter
+public class LiteDbWriter
 {
   private LiteDatabase db;
 
@@ -20,7 +20,12 @@ public class LiteDbWriter : IDataWriter
 
   public void Insert<T>(T record)
   {
-    var collection = db.GetCollection<T>();
+    this.Insert("history", record);
+  }
+
+  public void Insert<T>(string collectionName, T record)
+  {
+    var collection = db.GetCollection<T>(collectionName);
     collection.Insert(record);
   }
 

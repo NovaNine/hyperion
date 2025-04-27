@@ -6,6 +6,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
+using System.Linq;
+using UnityEngine.Profiling;
 
 namespace Hyperion.Writer
 {
@@ -26,26 +28,46 @@ namespace Hyperion.Writer
     {
       if (record == null || string.IsNullOrWhiteSpace(path))
         return;
+
+      try
+      {
+        var array = EnsurePathExists<JArray>(path);
+        array.Add(JToken.FromObject(record));
+        _dirty = true;
+      }
+      catch (Exception ex)
+      {
+        Output.Error($"Failed to insert into JSON at path '{path}': {ex.Message}");
+      }
+
+      Output.Trace($"JSON Insert at {path}: {record}");
     }
 
     public void Insert<T>(T record)
     {
-      if (record == null)
+      this.Insert("history", record);
+    }
+
+    public void Set<T>(string path, T value)
+    {
+      if (string.IsNullOrWhiteSpace(path))
         return;
+
+      var segments = SplitPath(path);
 
       try
       {
-        // Serialize the single record
-        string json = JsonConvert.SerializeObject(record, Formatting.None);
-
-        // Append to file (plus newline to separate records)
-        _streamWriter.WriteLine(json);
+        var parentPath = segments.Take(segments.Length - 1).ToArray();
+        var parent = EnsurePathExists<JObject>(parentPath);
+        parent[segments.Last()] = JToken.FromObject(value);
+        _dirty = true;
       }
       catch (Exception ex)
       {
-        // Handle or log the error if needed
-        Console.WriteLine($"[ERROR] Failed to write record: {ex.Message}");
+        Output.Error($"Failed to set JSON at path '{path}': {ex.Message}");
       }
+
+      Output.Trace($"JSON Set: {path} = {value}");
     }
 
     private string[] SplitPath(string path)
@@ -53,10 +75,14 @@ namespace Hyperion.Writer
       return path.Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    private JArray GetOrCreateArrayAtPath(string path)
+    private T EnsurePathExists<T>(string path) where T : JToken, new()
     {
       var segments = SplitPath(path);
+      return EnsurePathExists<T>(segments);
+    }
 
+    private T EnsurePathExists<T>(string[] segments) where T : JToken, new()
+    {
       JToken current = _rootObject;
 
       for (int i = 0; i < segments.Length; i++)
@@ -74,14 +100,12 @@ namespace Hyperion.Writer
         {
           if (i == segments.Length - 1)
           {
-            // Last segment — create array
-            var newArray = new JArray();
-            currentObject[segment] = newArray;
-            return newArray;
+            var newNode = new T();
+            currentObject[segment] = newNode;
+            return newNode;
           }
           else
           {
-            // Intermediate segment — create object
             var newObject = new JObject();
             currentObject[segment] = newObject;
             current = newObject;
@@ -93,20 +117,15 @@ namespace Hyperion.Writer
 
           if (i == segments.Length - 1)
           {
-            if (current.Type == JTokenType.Array)
-            {
-              return (JArray)current;
-            }
-            else
-            {
-              throw new InvalidOperationException($"Path error: '{path}' exists but is not an array.");
-            }
+            if (!(current is T))
+              throw new InvalidOperationException($"Path error: '{string.Join(".", segments)}' exists but is not a {typeof(T).Name}.");
           }
         }
       }
 
-      throw new InvalidOperationException($"Failed to navigate path '{path}'.");
+      return (T)current;
     }
+
 
     public void Flush()
     {
@@ -118,6 +137,7 @@ namespace Hyperion.Writer
         Directory.CreateDirectory(Path.GetDirectoryName(_filePath));
         File.WriteAllText(_filePath, _rootObject.ToString(Formatting.Indented));
         _dirty = false;
+        Output.Trace($"JSON Flush");
       }
       catch (Exception ex)
       {
