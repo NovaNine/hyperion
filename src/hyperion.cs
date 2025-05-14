@@ -30,6 +30,7 @@ namespace Hyperion
       //harmony.PatchAll(typeof(StartMenuController_Hook));
       harmony.PatchAll(typeof(TIGlobalResearchStateHooks));
       harmony.PatchAll(typeof(TIFactionStateHooks));
+      harmony.PatchAll(typeof(TIControlPointHooks));
     }
   }
 }

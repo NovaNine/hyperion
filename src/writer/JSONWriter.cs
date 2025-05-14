@@ -64,7 +64,7 @@ namespace Hyperion.Writer
         Output.Error($"Failed to insert into JSON at path '{path}': {ex.Message}");
       }
 
-      Output.Trace($"JSON Insert at {path}: {record}");
+      //Output.Trace($"JSON Insert at {path}: {record}");
     }
 
     /// <summary>

@@ -23,6 +23,12 @@ namespace Hyperion
         return;
       }
 
+      if (project == null)
+      {
+        Output.Debug($"Project was null");
+        return;
+      }
+
       Output.Info($"Project [{project?.displayName}]({project?.researchCost} XP) completed by [{__instance.displayName}, {__instance?.ideology.ideology.ToString()}]");
 
       DataCollector.Instance.ProjectIsFinishing(__instance, slot, project);

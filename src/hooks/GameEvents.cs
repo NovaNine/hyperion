@@ -20,5 +20,11 @@ namespace Hyperion
       DataCollector.RecreateInstance();
       DataCollector.Instance.GameHasStarted();
     }
+
+    private static void OnNationControlPointOwnerChanged(NationControlPointOwnerChanged ev)
+    {
+      Output.Trace($"NationControlPointOwnerChanged: {ev}");
+      //DataCollector.Instance.ControlPointOwnerChanging(ev.nation, ev.controlPoint);
+    }
   }
 }

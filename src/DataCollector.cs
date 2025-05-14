@@ -6,7 +6,9 @@ using PavonisInteractive.TerraInvicta;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text;
 using Hyperion.Writer;
+using PavonisInteractive.TerraInvicta.Systems;
 
 namespace Hyperion
 {
@@ -21,6 +23,11 @@ namespace Hyperion
     static string GAME_DATE_FORMAT = "yyyy-MM-dd HH:mm";
 
     /// <summary>
+    /// Format in which the game date will be sent to the writers (without time)
+    /// </summary>
+    static string GAME_DATE_ONLY_FORMAT = "yyyy-MM-dd";
+
+    /// <summary>
     /// Lazy helper for the singleton instance
     /// </summary>
     private static Lazy<DataCollector> lazyInstance = new Lazy<DataCollector>(() => new DataCollector());
@@ -28,8 +35,11 @@ namespace Hyperion
     /// <summary>
     /// Singleton instance of the DataCollector
     /// </summary>
-    public static DataCollector Instance => lazyInstance.Value;
-    
+    public static DataCollector Instance
+    {
+      get { return lazyInstance.Value; }
+    }
+
     private WriterManager writerManager;
     /// <summary>
     /// Track if we already disposed this instance
@@ -39,7 +49,11 @@ namespace Hyperion
     /// <summary>
     /// Private constructor to prevent outside creation
     /// </summary>
-    private DataCollector() { }
+    private DataCollector()
+    {
+      Output.Trace("DataCollector constructor");
+      writerManager = new WriterManager();
+    }
 
     /// <summary>
     /// Recreate the singleton instance of the DataCollector
@@ -55,10 +69,15 @@ namespace Hyperion
     /// </summary>
     public static void DisposeInstance()
     {
+      if (lazyInstance == null)
+        return;
+
       if (lazyInstance.IsValueCreated)
       {
         lazyInstance.Value.Dispose();
       }
+
+      lazyInstance = null;
     }
 
 
@@ -73,17 +92,31 @@ namespace Hyperion
       Output.Debug("Collecting data...");
 
       // activePlayer is TIFactionState
-      var playerIdeology = GameControl.control.activePlayer.ideology.ideology.ToString();
-      var playerFaction = GameControl.control.activePlayer.displayName.ToString();
-      var gameDate = TITimeState.Now();
+      if (GameControl.control == null || GameControl.control.activePlayer == null)
+      {
+        Output.Error("GameControl.control or GameControl.control.activePlayer is null. Cannot collect data.");
+        return;
+      }
+
+      var activePlayer = GameControl.control.activePlayer;
+      if (activePlayer.ideology == null)
+      {
+        Output.Error("activePlayer.ideology is null. Cannot collect data.");
+        return;
+      }
+      var playerIdeology = activePlayer.ideology.ideology.ToString();
+      var playerFaction = activePlayer.displayName.ToString();
+      var gameDateStr = GetGameDateString();
 
       Output.Info($"Playing as {playerFaction} ({playerIdeology})");
-      Output.Info($"It is {gameDate:ToString(GAME_DATE_FORMAT)} in the game.");
+      Output.Info($"It is {gameDateStr} in the game.");
 
-      writerManager = new WriterManager($"{playerFaction}-{playerIdeology}");
+      var now = DateTime.Now;
+      var fileName = new StringBuilder(playerIdeology) + "_" + now.ToString("yyyyMMdd_HHmmss") + (now.ToString("zzz").Replace(":", ""));
+      writerManager.SetFilename(fileName.ToString());
       writerManager.Set("meta.playerFaction", playerFaction);
       writerManager.Set("meta.playerIdeology", playerIdeology);
-      writerManager.Set("meta.initialGameDate", gameDate.ToString("yyyy-MM-dd HH:mm"));
+      writerManager.Set("meta.initialGameDate", gameDateStr);
       writerManager.Flush();
     }
 
@@ -96,8 +129,6 @@ namespace Hyperion
     /// <param name="tiFactionState"></param>
     public void TechIsFinishing(TIGlobalResearchState grs, TechProgress techProgress, int slot, TIFactionState tiFactionState)
     {
-      var gameDate = TITimeState.Now();
-
       var contributions = Obj();
       foreach (var rec in techProgress.factionContributions)
       {
@@ -110,7 +141,7 @@ namespace Hyperion
         ("type", "RESEARCH"),
         ("subtype", "TECH"),
         ("ev", "DONE"),
-        ("date", gameDate.ToString(GAME_DATE_FORMAT)),
+        ("date", GetGameDateString()),
         ("title", techProgress.techTemplate?.displayName),
         ("dataName", techProgress.techTemplate?.dataName),
         ("winner", tiFactionState.ideology.ideology.ToString()),
@@ -131,22 +162,116 @@ namespace Hyperion
     /// <param name="project"></param>
     public void ProjectIsFinishing(TIFactionState tiFactionState, int slot, TIProjectTemplate project)
     {
-      var gameDate = TITimeState.Now();
+      try
+      {
+        var sbIdeology = new StringBuilder();
+        var ideologyTemplate = tiFactionState?.ideology;
+        if (ideologyTemplate == null)
+        {
+          sbIdeology.Append("NULL Ideology Template");
+        }
+        else
+        {
+          sbIdeology.Append(ideologyTemplate.ideology.ToString());
+        }
+
+        var eventRecord = Obj(
+          ("type", "RESEARCH"),
+          ("subtype", "PROJECT"),
+          ("ev", "DONE"),
+          ("date", GetGameDateString()),
+          ("title", project.displayName),
+          ("dataName", project.dataName),
+          ("owner", sbIdeology.ToString()),
+          ("slot", slot),
+          ("totalCost", project.researchCost)
+        );
+
+        writerManager.Insert("history", eventRecord);
+        writerManager.Flush();
+      }
+      catch (Exception ex)
+      {
+        Output.Error($"Error in ProjectIsFinishing: {ex.Message}");
+      }
+    }
+
+    /// <summary>
+    /// Called when a control point is about to change ownership
+    /// </summary>
+    /// <param name="controlPoint"></param>
+    /// <param name="nation"></param>
+    /// <param name="newCampaign"></param>
+    public void ControlPointOwnerChanging(TIControlPoint controlPoint, TIFactionState newFaction, bool newCampaign)
+    {
+      var gameDateStr = GetGameDateString();
+      var nation = controlPoint?.nation;
+      var nationName = nation?.displayName ?? "NULL";
+      var oldOwner = controlPoint.faction;
+      var oldOwnerIdeology = oldOwner?.ideology?.ideology.ToString() ?? "NULL";
+      var newOwnerIdeology = newFaction?.ideology?.ideology.ToString() ?? "NULL";
+
+      Output.Info($"[{gameDateStr}] Control point in {nationName} ({controlPoint.positionInNation}) changing from {oldOwnerIdeology} to {newOwnerIdeology}");
 
       var eventRecord = Obj(
-        ("type", "RESEARCH"),
-        ("subtype", "PROJECT"),
-        ("ev", "DONE"),
-        ("date", gameDate.ToString(GAME_DATE_FORMAT)),
-        ("title", project.displayName),
-        ("dataName", project.dataName),
-        ("owner", tiFactionState?.ideology?.ideology.ToString() ?? "NULL"),
-        ("slot", slot),
-        ("totalCost", project.researchCost)
+        ("type", "TERRITORY"),
+        ("subtype", "CONTROL_POINT"),
+        ("ev", "CHANGE"),
+        ("date", gameDateStr),
+        ("controlPoint", controlPoint?.displayName),
+        ("nation", nationName),
+        ("nationId", nation?.ID.ToString()),
+        ("oldOwnerIdeology", oldOwnerIdeology),
+        ("oldOwnerFaction", oldOwner?.displayName),
+        ("newOwnerIdeology", newOwnerIdeology),
+        ("newOwnerFaction", newFaction?.displayName),
+        ("isNewCampaign", newCampaign.ToString())
       );
 
       writerManager.Insert("history", eventRecord);
       writerManager.Flush();
+    }
+
+    /// <summary>
+    /// Helper function to get the current game date as a formatted string
+    /// </summary>
+    /// <returns></returns>
+    public string GetGameDateString()
+    {
+      var gameDate = TITimeState.Now();
+
+      var sbGameDate = new StringBuilder();
+      if (gameDate == null)
+      {
+        sbGameDate.Append("0000-00-00 00:00");
+      }
+      else
+      {
+        sbGameDate.Append(gameDate.ToString(GAME_DATE_FORMAT));
+      }
+
+      return sbGameDate.ToString();
+    }
+
+    /// <summary>
+    /// Helper function to get the current game date as a formatted string (without time)
+    /// </summary>
+    /// <returns></returns>
+    public string GetGameDateOnlyString()
+    {
+      var gameDate = TITimeState.Now();
+
+      var sbGameDate = new StringBuilder();
+      if (gameDate == null)
+      {
+        sbGameDate.Append("0000-00-00");
+      }
+      else
+      {
+        sbGameDate.Append(gameDate.ToString(GAME_DATE_ONLY_FORMAT));
+      }
+
+      return sbGameDate.ToString();
     }
 
     /// <summary>
@@ -160,7 +285,7 @@ namespace Hyperion
     }
 
     /// <summary>
-    /// Disposes the DataCollector and its resources
+    /// 
     /// </summary>
     public void Dispose()
     {
